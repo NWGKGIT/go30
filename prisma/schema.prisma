@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id         String        @id @default(cuid())
+  email      String        @unique
+  createdAt  DateTime      @default(now())
+  xp         Int           @default(0)
+  streak     Int           @default(0)
+  lastActive DateTime?
+  progress   DayProgress[]
+}
+
+model CurriculumDay {
+  id          Int           @id // 1–30
+  phase       Int           // 1–4
+  week        Int           // 1–10
+  title       String
+  description String
+  xpReward    Int           @default(100)
+  tasks       Task[]
+  progress    DayProgress[]
+}
+
+model Task {
+  id          String           @id @default(cuid())
+  dayId       Int
+  label       String
+  type        TaskType
+  url         String?
+  day         CurriculumDay    @relation(fields: [dayId], references: [id])
+  completions TaskCompletion[]
+}
+
+model DayProgress {
+  id            String           @id @default(cuid())
+  userId        String
+  dayId         Int
+  status        DayStatus        @default(LOCKED)
+  completedAt   DateTime?
+  xpEarned      Int              @default(0)
+  user          User             @relation(fields: [userId], references: [id])
+  curriculumDay CurriculumDay    @relation(fields: [dayId], references: [id])
+  tasks         TaskCompletion[]
+  journal       JournalEntry?
+  snippets      CodeSnippet[]
+
+  @@unique([userId, dayId])
+}
+
+model TaskCompletion {
+  id          String      @id @default(cuid())
+  progressId  String
+  taskId      String
+  completedAt DateTime    @default(now())
+  progress    DayProgress @relation(fields: [progressId], references: [id])
+  task        Task        @relation(fields: [taskId], references: [id])
+
+  @@unique([progressId, taskId])
+}
+
+model JournalEntry {
+  id         String      @id @default(cuid())
+  progressId String      @unique
+  content    String      @default("")
+  updatedAt  DateTime    @updatedAt
+  progress   DayProgress @relation(fields: [progressId], references: [id])
+}
+
+model CodeSnippet {
+  id         String      @id @default(cuid())
+  progressId String
+  title      String?
+  code       String
+  createdAt  DateTime    @default(now())
+  progress   DayProgress @relation(fields: [progressId], references: [id])
+}
+
+enum TaskType {
+  BOOK
+  TOUR
+  CODE
+  MILESTONE
+}
+
+enum DayStatus {
+  LOCKED
+  AVAILABLE
+  IN_PROGRESS
+  COMPLETE
+}
