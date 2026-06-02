@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icons } from "@/components/ui/icons";
 
 interface Task {
   id: string;
@@ -79,35 +80,27 @@ export default function DayTaskList({
         {tasks.map((task) => (
           <label
             key={task.id}
-            className={`flex items-start gap-3 px-4 py-3.5 cursor-pointer group transition-colors ${
-              task.completed ? "opacity-60" : "hover:bg-surface-raised"
-            } ${dayStatus === "LOCKED" ? "pointer-events-none" : ""}`}
+            className={`flex items-start gap-3 px-4 py-3.5 cursor-pointer group transition-colors ${task.completed ? "opacity-60" : "hover:bg-surface-raised"
+              } ${dayStatus === "LOCKED" ? "pointer-events-none" : ""}`}
             onClick={() => toggleTask(task.id, task.completed)}
           >
             <div
-              className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all ${
-                task.completed
-                  ? "bg-accent-blue border-accent-blue"
-                  : "border-surface-border group-hover:border-accent-blue"
-              }`}
+              className={`mt-0.5 w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-all ${task.completed
+                ? "bg-accent-blue border-accent-blue"
+                : "border-surface-border group-hover:border-accent-blue"
+                }`}
             >
               {task.completed && (
-                <span
-                  className="material-symbols-outlined text-white text-[11px]"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  check
-                </span>
+                <Icons.check size={11} className="text-white" fill />
               )}
             </div>
 
             <div className="flex flex-col flex-1 min-w-0 gap-0.5">
               <span
-                className={`text-sm font-medium transition-colors ${
-                  task.completed
-                    ? "line-through text-text-muted"
-                    : "text-text-primary"
-                }`}
+                className={`text-sm font-medium transition-colors ${task.completed
+                  ? "line-through text-text-muted"
+                  : "text-text-primary"
+                  }`}
               >
                 {task.label}
               </span>
@@ -125,9 +118,7 @@ export default function DayTaskList({
                   onClick={(e) => e.stopPropagation()}
                   className="text-text-muted hover:text-accent-blue transition-colors"
                 >
-                  <span className="material-symbols-outlined text-[14px]">
-                    open_in_new
-                  </span>
+                  <Icons.open_in_new size={14} />
                 </a>
               )}
             </div>

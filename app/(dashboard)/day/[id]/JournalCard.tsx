@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Icons } from "@/components/ui/icons";
 
 interface Props {
   progressId: string;
@@ -43,26 +44,19 @@ export default function JournalCard({ progressId, initialContent }: Props) {
       {/* Header */}
       <div className="px-4 py-2.5 border-b border-surface-border flex items-center justify-between bg-surface-raised flex-shrink-0">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-text-muted">
-            edit_note
-          </span>
+
+          <Icons.edit_note className="text-text-muted" size={16} />
           <h2 className="font-semibold text-text-primary text-sm">Journal</h2>
         </div>
         <span
-          className={`text-2xs flex items-center gap-1 transition-all ${
-            saveStatus === "saved"
-              ? "text-accent-green"
-              : saveStatus === "saving"
+          className={`text-2xs flex items-center gap-1 transition-all ${saveStatus === "saved"
+            ? "text-accent-green"
+            : saveStatus === "saving"
               ? "text-text-muted"
               : "text-text-muted opacity-0"
-          }`}
+            }`}
         >
-          <span
-            className="material-symbols-outlined text-[12px]"
-            style={{ fontVariationSettings: "'FILL' 1" }}
-          >
-            {saveStatus === "saving" ? "sync" : "check_circle"}
-          </span>
+          <Icons.sync spin={saveStatus === "saving"} size={12} className={`transition-opacity ${saveStatus === "saved" ? "opacity-100" : saveStatus === "saving" ? "opacity-100" : "opacity-0"}`} />
           {saveStatus === "saving" ? "Saving…" : "Saved"}
         </span>
       </div>

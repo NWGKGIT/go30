@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Icons } from "@/components/ui/icons";
 
 interface Props {
   taskId: string;
@@ -93,9 +94,7 @@ export default function GoTourCard({ taskId, url, label, dayId, completed }: Pro
       {/* Header */}
       <div className="px-4 py-3 border-b border-surface-border flex items-center justify-between bg-surface-raised">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-accent-blue">
-            terminal
-          </span>
+          <Icons.terminal size={16} className="text-accent-blue" />
           <h2 className="font-semibold text-text-primary text-sm">Go Tour</h2>
         </div>
 
@@ -112,9 +111,7 @@ export default function GoTourCard({ taskId, url, label, dayId, completed }: Pro
                 disabled={marked}
                 className="btn-primary text-2xs py-1 px-2.5 flex items-center gap-1"
               >
-                <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  check_circle
-                </span>
+                <Icons.check_circle size={12} fill />
                 Mark done
               </button>
             )}
@@ -123,9 +120,7 @@ export default function GoTourCard({ taskId, url, label, dayId, completed }: Pro
 
         {completed && (
           <span className="flex items-center gap-1 text-accent-green text-2xs font-semibold">
-            <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-              check_circle
-            </span>
+            <Icons.check_circle size={14} fill />
             Completed
           </span>
         )}
@@ -160,9 +155,7 @@ export default function GoTourCard({ taskId, url, label, dayId, completed }: Pro
         {iframeOk === false && (
           <div className="flex flex-col items-center justify-center h-full p-6 text-center gap-4 min-h-[360px]">
             <div className="w-12 h-12 bg-accent-blue-dim rounded-xl flex items-center justify-center">
-              <span className="material-symbols-outlined text-accent-blue text-[24px]">
-                code_blocks
-              </span>
+              <Icons.code_blocks size={24} className="text-accent-blue" />
             </div>
             <div>
               <h3 className="font-semibold text-text-primary text-sm mb-1">
@@ -179,9 +172,7 @@ export default function GoTourCard({ taskId, url, label, dayId, completed }: Pro
               rel="noopener noreferrer"
               className="btn-primary flex items-center gap-2 text-sm"
             >
-              <span className="material-symbols-outlined text-[16px]">
-                open_in_new
-              </span>
+              <Icons.open_in_new size={16} />
               Open Go Tour
             </a>
             {!completed && (
@@ -199,9 +190,7 @@ export default function GoTourCard({ taskId, url, label, dayId, completed }: Pro
         {/* Loading state */}
         {iframeOk === null && !completed && (
           <div className="flex items-center justify-center h-full min-h-[360px]">
-            <span className="material-symbols-outlined text-[24px] text-text-muted animate-spin">
-              progress_activity
-            </span>
+            <Icons.loading size={24} className="text-text-muted" />
           </div>
         )}
       </div>

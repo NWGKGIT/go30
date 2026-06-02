@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { signIn, signUp } from "@/app/actions/auth";
+import { Icons } from "@/components/ui/icons";
 
 export default function LoginPage() {
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -33,14 +34,7 @@ export default function LoginPage() {
         setMode("signin");
         setLoading(false);
       }
-      // If no result, redirect happened server-side
     }
-  }
-
-  function switchMode() {
-    setMode((m) => (m === "signin" ? "signup" : "signin"));
-    setError(null);
-    setSuccess(null);
   }
 
   return (
@@ -64,22 +58,20 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => { setMode("signin"); setError(null); setSuccess(null); }}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                mode === "signin"
-                  ? "bg-surface text-text-primary shadow-sm"
-                  : "text-text-muted hover:text-text-secondary"
-              }`}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${mode === "signin"
+                ? "bg-surface text-text-primary shadow-sm"
+                : "text-text-muted hover:text-text-secondary"
+                }`}
             >
               Sign in
             </button>
             <button
               type="button"
               onClick={() => { setMode("signup"); setError(null); setSuccess(null); }}
-              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                mode === "signup"
-                  ? "bg-surface text-text-primary shadow-sm"
-                  : "text-text-muted hover:text-text-secondary"
-              }`}
+              className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-colors ${mode === "signup"
+                ? "bg-surface text-text-primary shadow-sm"
+                : "text-text-muted hover:text-text-secondary"
+                }`}
             >
               Create account
             </button>
@@ -87,10 +79,7 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-xs font-medium text-text-secondary mb-1.5"
-              >
+              <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">
                 Email
               </label>
               <input
@@ -105,10 +94,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-xs font-medium text-text-secondary mb-1.5"
-              >
+              <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-1.5">
                 Password
               </label>
               <input
@@ -131,9 +117,7 @@ export default function LoginPage() {
             {/* Error */}
             {error && (
               <div className="flex items-start gap-2 text-accent-coral text-xs bg-accent-coral-dim border border-accent-coral/20 rounded-lg px-3 py-2">
-                <span className="material-symbols-outlined text-[14px] flex-shrink-0 mt-0.5">
-                  error
-                </span>
+                <Icons.error size={14} className="flex-shrink-0 mt-0.5" />
                 {error}
               </div>
             )}
@@ -141,9 +125,7 @@ export default function LoginPage() {
             {/* Success */}
             {success && (
               <div className="flex items-start gap-2 text-accent-green text-xs bg-accent-green-dim border border-accent-green/20 rounded-lg px-3 py-2">
-                <span className="material-symbols-outlined text-[14px] flex-shrink-0 mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  check_circle
-                </span>
+                <Icons.check_circle size={14} className="flex-shrink-0 mt-0.5" fill />
                 {success}
               </div>
             )}
@@ -155,9 +137,7 @@ export default function LoginPage() {
             >
               {loading ? (
                 <>
-                  <span className="material-symbols-outlined text-[16px] animate-spin">
-                    progress_activity
-                  </span>
+                  <Icons.loading size={16} />
                   {mode === "signin" ? "Signing in…" : "Creating account…"}
                 </>
               ) : mode === "signin" ? (
