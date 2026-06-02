@@ -1,6 +1,7 @@
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { Icons } from "@/components/ui/icons";
 
 export default async function JournalPage() {
   const user = await getAuthUser();
@@ -41,9 +42,7 @@ export default async function JournalPage() {
 
       {entries.length === 0 ? (
         <div className="card p-10 text-center">
-          <span className="material-symbols-outlined text-4xl text-text-muted mb-3 block">
-            edit_note
-          </span>
+          <Icons.edit_note size={36} className="text-text-muted mb-3 block mx-auto" />
           <h2 className="font-semibold text-text-primary">No journal entries yet</h2>
           <p className="text-text-secondary text-sm mt-1">
             Complete your first day and write some notes.
@@ -75,9 +74,7 @@ export default async function JournalPage() {
                 >
                   {/* Timeline dot */}
                   <div className="hidden md:flex absolute left-0 top-4 w-7 h-7 rounded-full bg-surface border border-surface-border items-center justify-center group-hover:border-accent-blue group-hover:text-accent-blue transition-colors z-10">
-                    <span className="material-symbols-outlined text-[14px] text-text-muted group-hover:text-accent-blue" style={{ fontVariationSettings: "'FILL' 1" }}>
-                      edit_note
-                    </span>
+                    <Icons.edit_note size={14} className="text-text-muted group-hover:text-accent-blue" />
                   </div>
 
                   <Link href={`/day/${day.id}`}>
@@ -106,9 +103,7 @@ export default async function JournalPage() {
                       {entry.progress.snippets.length > 0 && (
                         <div className="mt-3 border border-surface-border rounded-lg overflow-hidden">
                           <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-raised border-b border-surface-border">
-                            <span className="material-symbols-outlined text-[14px] text-text-muted">
-                              code
-                            </span>
+                            <Icons.code size={14} className="text-text-muted" />
                             <span className="font-mono text-2xs text-text-muted">
                               {entry.progress.snippets[0].title ?? "snippet.go"}
                             </span>

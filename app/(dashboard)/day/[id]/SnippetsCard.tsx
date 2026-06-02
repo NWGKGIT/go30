@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Icons } from "@/components/ui/icons";
 
 interface Snippet {
   id: string;
@@ -52,9 +53,7 @@ export default function SnippetsCard({ progressId, initialSnippets }: Props) {
       {/* Header */}
       <div className="px-4 py-2.5 border-b border-surface-border flex items-center justify-between bg-surface-raised flex-shrink-0">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[16px] text-text-muted">
-            data_object
-          </span>
+          <Icons.data_object size={16} className="text-text-muted" />
           <h2 className="font-semibold text-text-primary text-sm">Snippets</h2>
         </div>
         <button
@@ -62,9 +61,7 @@ export default function SnippetsCard({ progressId, initialSnippets }: Props) {
           className="w-6 h-6 rounded-full flex items-center justify-center border border-surface-border hover:bg-surface-raised transition-colors text-text-secondary hover:text-text-primary"
           title="Add snippet"
         >
-          <span className="material-symbols-outlined text-[14px]">
-            {showAdd ? "close" : "add"}
-          </span>
+          {showAdd ? <Icons.close size={14} /> : <Icons.add size={14} />}
         </button>
       </div>
 
@@ -150,14 +147,13 @@ function SnippetItem({
             className="opacity-0 group-hover:opacity-100 transition-opacity text-text-muted hover:text-accent-coral p-0.5"
             title="Delete"
           >
-            <span className="material-symbols-outlined text-[14px]">delete</span>
+            <Icons.delete size={14} />
           </button>
-          <span
-            className="material-symbols-outlined text-[16px] text-text-muted transition-transform duration-200"
+          <Icons.expand_more
+            size={16}
+            className="text-text-muted transition-transform duration-200"
             style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)" }}
-          >
-            expand_more
-          </span>
+          />
         </div>
       </button>
 

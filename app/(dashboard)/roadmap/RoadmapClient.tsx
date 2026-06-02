@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Icons } from "@/components/ui/icons";
 
 interface Day {
   id: number;
@@ -71,9 +72,7 @@ export default function RoadmapClient({ days, activeDay }: Props) {
           onClick={allCollapsed ? expandAll : collapseAll}
           className="btn-outline text-xs flex items-center gap-1.5"
         >
-          <span className="material-symbols-outlined text-[14px]">
-            {allCollapsed ? "expand_all" : "collapse_all"}
-          </span>
+          {allCollapsed ? <Icons.expand_all size={14} /> : <Icons.collapse_all size={14} />}
           {allCollapsed ? "Expand All" : "Collapse All"}
         </button>
       </div>
@@ -111,12 +110,11 @@ export default function RoadmapClient({ days, activeDay }: Props) {
                   <span className="font-mono">
                     {completedInPhase}/{phaseDays.length}
                   </span>
-                  <span
-                    className="material-symbols-outlined text-[18px] transition-transform duration-200"
+                  <Icons.expand_more
+                    size={18}
+                    className="transition-transform duration-200"
                     style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
-                  >
-                    expand_more
-                  </span>
+                  />
                 </div>
               </button>
 
@@ -159,12 +157,7 @@ export default function RoadmapClient({ days, activeDay }: Props) {
                                     }`}
                                   >
                                     {isComplete && (
-                                      <span
-                                        className="material-symbols-outlined text-white text-[11px]"
-                                        style={{ fontVariationSettings: "'FILL' 1" }}
-                                      >
-                                        check
-                                      </span>
+                                      <Icons.check size={11} className="text-white" fill />
                                     )}
                                   </div>
 
@@ -213,9 +206,7 @@ export default function RoadmapClient({ days, activeDay }: Props) {
                                 {MILESTONES[day.id] && (
                                   <div className="my-2 mx-0 px-3 py-2.5 bg-surface-raised border border-surface-border rounded-lg flex items-center gap-3">
                                     <div className="w-8 h-8 bg-surface-border rounded-lg flex items-center justify-center flex-shrink-0">
-                                      <span className="material-symbols-outlined text-[16px] text-text-secondary">
-                                        flag
-                                      </span>
+                                      <Icons.flag size={16} className="text-text-secondary" />
                                     </div>
                                     <div>
                                       <div className="text-2xs text-text-muted uppercase tracking-wider font-bold">

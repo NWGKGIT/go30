@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icon, IconName } from "@/components/ui/icons";
 
-const navItems = [
+const navItems: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Dashboard", icon: "dashboard" },
   { href: "/roadmap", label: "Roadmap", icon: "map" },
   { href: "/journal", label: "Journal", icon: "edit_note" },
@@ -32,14 +33,11 @@ export default function BottomNav() {
             {isActive && (
               <div className="absolute top-0 w-8 h-0.5 bg-accent-blue rounded-b-full" />
             )}
-            <span
-              className="material-symbols-outlined text-[22px]"
-              style={{
-                fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0",
-              }}
-            >
-              {item.icon}
-            </span>
+            <Icon
+              name={item.icon}
+              size={22}
+              fill={isActive}
+            />
             <span className="text-2xs font-medium">{item.label}</span>
           </Link>
         );

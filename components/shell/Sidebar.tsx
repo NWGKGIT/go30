@@ -3,11 +3,12 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/actions/auth";
+import { Icons, Icon, IconName } from "@/components/ui/icons";
 
 interface NavItem {
   href: string;
   label: string;
-  icon: string;
+  icon: IconName;
 }
 
 const navItems: NavItem[] = [
@@ -58,16 +59,11 @@ export default function Sidebar({ streak, xp }: SidebarProps) {
                   href={item.href}
                   className={isActive ? "nav-link-active" : "nav-link"}
                 >
-                  <span
-                    className="material-symbols-outlined text-[20px]"
-                    style={{
-                      fontVariationSettings: isActive
-                        ? "'FILL' 1"
-                        : "'FILL' 0",
-                    }}
-                  >
-                    {item.icon}
-                  </span>
+                  <Icon
+                    name={item.icon}
+                    size={20}
+                    fill={isActive}
+                  />
                   {item.label}
                 </Link>
               </li>
@@ -80,9 +76,7 @@ export default function Sidebar({ streak, xp }: SidebarProps) {
       <div className="px-5">
         <div className="border-t border-surface-border pt-4 mb-4 flex flex-col gap-2">
           <div className="flex items-center gap-2 text-text-secondary text-xs">
-            <span className="material-symbols-outlined text-[16px] text-accent-coral">
-              local_fire_department
-            </span>
+            <Icons.local_fire_department size={16} className="text-accent-coral" />
             <span>
               Streak:{" "}
               <span className="text-text-primary font-semibold">
@@ -91,9 +85,7 @@ export default function Sidebar({ streak, xp }: SidebarProps) {
             </span>
           </div>
           <div className="flex items-center gap-2 text-text-secondary text-xs">
-            <span className="material-symbols-outlined text-[16px] text-accent-purple">
-              military_tech
-            </span>
+            <Icons.military_tech size={16} className="text-accent-purple" fill />
             <span>
               XP:{" "}
               <span className="text-text-primary font-semibold">
@@ -108,9 +100,7 @@ export default function Sidebar({ streak, xp }: SidebarProps) {
             type="submit"
             className="w-full btn-outline text-xs py-1.5 text-center flex items-center justify-center gap-2"
           >
-            <span className="material-symbols-outlined text-[14px]">
-              logout
-            </span>
+            <Icons.logout size={14} />
             Logout
           </button>
         </form>

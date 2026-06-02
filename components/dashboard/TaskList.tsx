@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
+import { Icons } from "@/components/ui/icons";
 
 interface Task {
   id: string;
@@ -117,9 +118,7 @@ export default function TaskList({ tasks: initialTasks, dayId, dayStatus }: Prop
               }`}
             >
               {task.completed && (
-                <span className="material-symbols-outlined text-white text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  check
-                </span>
+                <Icons.check size={12} className="text-white" fill />
               )}
             </div>
 
@@ -147,9 +146,7 @@ export default function TaskList({ tasks: initialTasks, dayId, dayStatus }: Prop
                     onClick={(e) => e.stopPropagation()}
                     className="text-text-muted hover:text-accent-blue transition-colors"
                   >
-                    <span className="material-symbols-outlined text-[14px]">
-                      open_in_new
-                    </span>
+                    <Icons.open_in_new size={14} />
                   </a>
                 )}
               </div>

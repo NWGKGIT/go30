@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 import TaskList from "@/components/dashboard/TaskList";
 import CalendarGrid from "@/components/dashboard/CalendarGrid";
+import { Icons, Icon, IconName } from "@/components/ui/icons";
 
 export default async function DashboardPage() {
   const user = await getAuthUser();
@@ -128,9 +129,7 @@ export default async function DashboardPage() {
         </section>
       ) : (
         <div className="card p-8 text-center">
-          <span className="material-symbols-outlined text-4xl text-accent-green mb-3 block" style={{ fontVariationSettings: "'FILL' 1" }}>
-            emoji_events
-          </span>
+          <Icons.emoji_events size={36} className="text-accent-green mb-3 block mx-auto" fill />
           <h2 className="font-bold text-text-primary text-lg">
             All 30 days complete! 🎉
           </h2>
@@ -153,7 +152,7 @@ function StatCard({
   value,
   unit,
 }: {
-  icon: string;
+  icon: IconName;
   iconColor: string;
   label: string;
   value: string;
@@ -162,12 +161,12 @@ function StatCard({
   return (
     <div className="card p-3 md:p-4 flex flex-col gap-1.5">
       <div className="flex items-center gap-1.5 text-text-muted">
-        <span
-          className={`material-symbols-outlined text-[16px] ${iconColor}`}
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          {icon}
-        </span>
+        <Icon
+          name={icon}
+          size={16}
+          className={iconColor}
+          fill
+        />
         <span className="text-2xs font-medium uppercase tracking-wider">
           {label}
         </span>

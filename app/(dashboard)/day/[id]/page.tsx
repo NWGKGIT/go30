@@ -2,6 +2,7 @@ import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { Icons } from "@/components/ui/icons";
 import DayTaskList from "./DayTaskList";
 import GoTourCard from "./GoTourCard";
 import JournalCard from "./JournalCard";
@@ -59,18 +60,14 @@ export default async function DayPage({ params }: Props) {
         <Link href="/" className="hover:text-text-primary transition-colors">
           Dashboard
         </Link>
-        <span className="material-symbols-outlined text-[14px]">
-          chevron_right
-        </span>
+        <Icons.chevron_right size={14} />
         <Link
           href="/roadmap"
           className="hover:text-text-primary transition-colors"
         >
           Roadmap
         </Link>
-        <span className="material-symbols-outlined text-[14px]">
-          chevron_right
-        </span>
+        <Icons.chevron_right size={14} />
         <span className="text-text-primary font-medium">Day {dayId}</span>
       </nav>
 

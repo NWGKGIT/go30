@@ -1,6 +1,7 @@
 import { getAuthUser, ensureDayProgressRecords } from "@/lib/auth";
 import Sidebar from "@/components/shell/Sidebar";
 import BottomNav from "@/components/shell/BottomNav";
+import { Icons } from "@/components/ui/icons";
 
 export default async function DashboardLayout({
   children,
@@ -27,15 +28,11 @@ export default async function DashboardLayout({
           </div>
           <div className="flex items-center gap-3 text-text-secondary text-xs">
             <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px] text-accent-coral">
-                local_fire_department
-              </span>
+              <Icons.local_fire_department size={14} className="text-accent-coral" />
               {user.streak}
             </span>
             <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px] text-accent-purple">
-                military_tech
-              </span>
+              <Icons.military_tech size={14} className="text-accent-purple" fill />
               {user.xp.toLocaleString()}
             </span>
           </div>

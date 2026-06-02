@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { Icons } from "@/components/ui/icons";
 
 interface DayCell {
   id: number;
@@ -58,27 +59,16 @@ export default function CalendarGrid({ days }: Props) {
               </span>
 
               {day.status === "COMPLETE" && (
-                <span
-                  className="material-symbols-outlined text-[16px] mt-1"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  check
-                </span>
+                <Icons.check size={16} className="mt-1" fill />
               )}
               {day.status === "IN_PROGRESS" && (
-                <span className="material-symbols-outlined text-[16px] mt-1 animate-pulse-slow">
-                  play_arrow
-                </span>
+                <Icons.play_arrow size={16} className="mt-1 animate-pulse-slow" />
               )}
               {isAvailable && (
-                <span className="material-symbols-outlined text-[16px] mt-1">
-                  radio_button_unchecked
-                </span>
+                <Icons.radio_button_unchecked size={16} className="mt-1" />
               )}
               {day.status === "LOCKED" && (
-                <span className="material-symbols-outlined text-[14px] mt-1">
-                  lock
-                </span>
+                <Icons.lock size={14} className="mt-1" />
               )}
 
               {day.status === "COMPLETE" && day.xpEarned > 0 && (
