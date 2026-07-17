@@ -16,44 +16,68 @@ model User {
   xp         Int           @default(0)
   streak     Int           @default(0)
   lastActive DateTime?
+  pathSlug   String        @default("go-30")
   progress   DayProgress[]
 }
 
+model Path {
+  slug        String          @id
+  version     String
+  title       String
+  description String
+  days        CurriculumDay[]
+}
+
 model CurriculumDay {
-  id          Int           @id // 1–30
-  phase       Int           // 1–4
-  week        Int           // 1–10
+  id          String        @id @default(cuid())
+  pathSlug    String
+  slug        String // day-01, day-02, etc.
+  dayNumber   Int
+  phase       Int
+  week        Int
   title       String
   description String
   xpReward    Int           @default(100)
+  sortOrder   Int
+  path        Path          @relation(fields: [pathSlug], references: [slug], onDelete: Cascade)
   tasks       Task[]
   progress    DayProgress[]
+
+  @@unique([pathSlug, slug])
+  @@unique([pathSlug, dayNumber])
+  @@index([pathSlug, sortOrder])
 }
 
 model Task {
   id          String           @id @default(cuid())
-  dayId       Int
+  dayId       String
+  slug        String // tour-basics, tgpl-ch1-2, etc.
   label       String
   type        TaskType
   url         String?
-  day         CurriculumDay    @relation(fields: [dayId], references: [id])
+  sortOrder   Int
+  day         CurriculumDay    @relation(fields: [dayId], references: [id], onDelete: Cascade)
   completions TaskCompletion[]
+
+  @@unique([dayId, slug])
+  @@index([dayId, sortOrder])
 }
 
 model DayProgress {
   id            String           @id @default(cuid())
   userId        String
-  dayId         Int
+  dayId         String
   status        DayStatus        @default(LOCKED)
   completedAt   DateTime?
   xpEarned      Int              @default(0)
-  user          User             @relation(fields: [userId], references: [id])
-  curriculumDay CurriculumDay    @relation(fields: [dayId], references: [id])
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  curriculumDay CurriculumDay    @relation(fields: [dayId], references: [id], onDelete: Cascade)
   tasks         TaskCompletion[]
   journal       JournalEntry?
   snippets      CodeSnippet[]
 
   @@unique([userId, dayId])
+  @@index([userId, status])
 }
 
 model TaskCompletion {
@@ -61,8 +85,8 @@ model TaskCompletion {
   progressId  String
   taskId      String
   completedAt DateTime    @default(now())
-  progress    DayProgress @relation(fields: [progressId], references: [id])
-  task        Task        @relation(fields: [taskId], references: [id])
+  progress    DayProgress @relation(fields: [progressId], references: [id], onDelete: Cascade)
+  task        Task        @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@unique([progressId, taskId])
 }
@@ -72,7 +96,7 @@ model JournalEntry {
   progressId String      @unique
   content    String      @default("")
   updatedAt  DateTime    @updatedAt
-  progress   DayProgress @relation(fields: [progressId], references: [id])
+  progress   DayProgress @relation(fields: [progressId], references: [id], onDelete: Cascade)
 }
 
 model CodeSnippet {
@@ -81,7 +105,9 @@ model CodeSnippet {
   title      String?
   code       String
   createdAt  DateTime    @default(now())
-  progress   DayProgress @relation(fields: [progressId], references: [id])
+  progress   DayProgress @relation(fields: [progressId], references: [id], onDelete: Cascade)
+
+  @@index([progressId, createdAt])
 }
 
 enum TaskType {

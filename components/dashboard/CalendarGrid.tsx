@@ -24,8 +24,7 @@ export default function CalendarGrid({ days }: Props) {
       <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-10 gap-2">
         {days.map((day) => {
           const isClickable =
-            day.status === "COMPLETE" || day.status === "IN_PROGRESS";
-          const isAvailable = day.status === "AVAILABLE";
+            day.status === "COMPLETE" || day.status === "IN_PROGRESS" || day.status === "AVAILABLE";
 
           return (
             <button
@@ -46,8 +45,8 @@ export default function CalendarGrid({ days }: Props) {
                 ${day.status === "IN_PROGRESS"
                   ? "bg-accent-blue-dim border-2 border-accent-blue text-accent-blue cursor-pointer hover:scale-105"
                   : ""}
-                ${isAvailable
-                  ? "bg-surface-raised border border-surface-border text-text-secondary cursor-default"
+                ${day.status === "AVAILABLE"
+                  ? "bg-surface-raised border border-surface-border text-text-secondary cursor-pointer hover:scale-105 hover:border-accent-blue"
                   : ""}
                 ${day.status === "LOCKED"
                   ? "bg-surface border border-surface-border text-text-muted opacity-40 cursor-not-allowed"
@@ -64,7 +63,7 @@ export default function CalendarGrid({ days }: Props) {
               {day.status === "IN_PROGRESS" && (
                 <Icons.play_arrow size={16} className="mt-1 animate-pulse-slow" />
               )}
-              {isAvailable && (
+              {day.status === "AVAILABLE" && (
                 <Icons.radio_button_unchecked size={16} className="mt-1" />
               )}
               {day.status === "LOCKED" && (

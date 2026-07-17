@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Icons } from "@/components/ui/icons";
+import { createSnippet, deleteSnippet as deleteSnippetAction } from "@/app/actions/snippets";
 
 interface Snippet {
   id: string;
@@ -25,27 +26,25 @@ export default function SnippetsCard({ progressId, initialSnippets }: Props) {
     if (!newCode.trim()) return;
     setSaving(true);
 
-    const res = await fetch("/api/snippets", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        progressId,
-        title: newTitle.trim() || null,
-        code: newCode.trim(),
-      }),
-    });
+    const result = await createSnippet(progressId, newCode.trim(), newTitle.trim() || undefined);
 
-    const data = await res.json();
-    setSnippets((prev) => [...prev, data]);
-    setNewTitle("");
-    setNewCode("");
-    setShowAdd(false);
+    if (result.error) {
+      alert(result.error);
+    } else if (result.snippet) {
+      setSnippets((prev) => [...prev, result.snippet]);
+      setNewTitle("");
+      setNewCode("");
+      setShowAdd(false);
+    }
+
     setSaving(false);
   }
 
-  async function deleteSnippet(id: string) {
-    await fetch(`/api/snippets/${id}`, { method: "DELETE" });
-    setSnippets((prev) => prev.filter((s) => s.id !== id));
+  async function handleDelete(id: string) {
+    const result = await deleteSnippetAction(id);
+    if (!result.error) {
+      setSnippets((prev) => prev.filter((s) => s.id !== id));
+    }
   }
 
   return (
@@ -112,7 +111,7 @@ export default function SnippetsCard({ progressId, initialSnippets }: Props) {
           <SnippetItem
             key={snippet.id}
             snippet={snippet}
-            onDelete={deleteSnippet}
+            onDelete={handleDelete}
           />
         ))}
       </div>

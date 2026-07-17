@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Icons } from "@/components/ui/icons";
+import type { PathPhase, PathMilestone } from "@/content/paths/go30";
 
 interface Day {
   id: number;
@@ -16,26 +17,31 @@ interface Day {
 interface Props {
   days: Day[];
   activeDay: number | null;
+  phases: PathPhase[];
+  milestones: PathMilestone[];
 }
 
-const PHASE_INFO: Record<number, { label: string; desc: string; color: string }> = {
-  1: { label: "Phase 1", desc: "Syntax Sprint · Days 1–7", color: "text-accent-blue bg-accent-blue-dim" },
-  2: { label: "Phase 2", desc: "Core Concepts · Days 8–14", color: "text-accent-purple bg-accent-purple-dim" },
-  3: { label: "Phase 3", desc: "Standard Library · Days 15–21", color: "text-accent-amber bg-accent-amber-dim" },
-  4: { label: "Phase 4", desc: "Projects · Days 22–30", color: "text-accent-green bg-accent-green-dim" },
-};
+export default function RoadmapClient({ days, activeDay, phases, milestones }: Props) {
+  const [openPhases, setOpenPhases] = useState<Set<number>>(() => {
+    // Initialize from localStorage on first render only
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('roadmap-open-phases');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          return new Set(parsed);
+        } catch {
+          // ignore
+        }
+      }
+    }
+    return new Set([1, 2, 3, 4]);
+  });
 
-// Milestone days (end of each phase)
-const MILESTONES: Record<number, string> = {
-  7: "Milestone 1 · CLI Task Manager",
-  14: "Milestone 2 · REST API",
-  21: "Milestone 3 · Concurrent Scraper",
-  30: "Milestone 4 · Full Codecrafters Project",
-};
-
-export default function RoadmapClient({ days, activeDay }: Props) {
-  const phases = [1, 2, 3, 4];
-  const [openPhases, setOpenPhases] = useState<Set<number>>(new Set([1, 2, 3, 4]));
+  // Save state to localStorage
+  useEffect(() => {
+    localStorage.setItem('roadmap-open-phases', JSON.stringify([...openPhases]));
+  }, [openPhases]);
 
   function togglePhase(phase: number) {
     setOpenPhases((prev) => {
@@ -51,10 +57,12 @@ export default function RoadmapClient({ days, activeDay }: Props) {
   }
 
   function expandAll() {
-    setOpenPhases(new Set([1, 2, 3, 4]));
+    setOpenPhases(new Set(phases.map(p => p.number)));
   }
 
   const allCollapsed = openPhases.size === 0;
+
+  const milestoneMap = new Map(milestones.map(m => [m.dayNumber, m.label]));
 
   return (
     <div className="flex flex-col gap-5 animate-in">
@@ -65,7 +73,7 @@ export default function RoadmapClient({ days, activeDay }: Props) {
             Curriculum Overview
           </h1>
           <p className="text-text-muted text-xs mt-0.5">
-            Your 30-day journey to mastering Go
+            Your {days.length}-day journey to mastering Go
           </p>
         </div>
         <button
@@ -80,30 +88,36 @@ export default function RoadmapClient({ days, activeDay }: Props) {
       {/* Phases */}
       <div className="flex flex-col gap-4">
         {phases.map((phase) => {
-          const phaseDays = days.filter((d) => d.phase === phase);
-          const info = PHASE_INFO[phase];
-          const isOpen = openPhases.has(phase);
+          const phaseDays = days.filter((d) => d.phase === phase.number);
+          const isOpen = openPhases.has(phase.number);
           const completedInPhase = phaseDays.filter((d) => d.status === "COMPLETE").length;
 
           // Group by week
           const weeks = [...new Set(phaseDays.map((d) => d.week))];
 
+          const colorClasses: Record<string, string> = {
+            'accent-blue': 'text-accent-blue bg-accent-blue-dim',
+            'accent-purple': 'text-accent-purple bg-accent-purple-dim',
+            'accent-amber': 'text-accent-amber bg-accent-amber-dim',
+            'accent-green': 'text-accent-green bg-accent-green-dim',
+          };
+
           return (
-            <div key={phase} className="card overflow-hidden">
+            <div key={phase.number} className="card overflow-hidden">
               {/* Phase header */}
               <button
-                onClick={() => togglePhase(phase)}
+                onClick={() => togglePhase(phase.number)}
                 className="w-full bg-surface-raised px-4 py-3 flex items-center justify-between hover:bg-surface-border/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${info.color}`}>
-                    P{phase}
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${colorClasses[phase.colorToken] ?? ''}`}>
+                    P{phase.number}
                   </span>
                   <div className="text-left">
                     <div className="font-semibold text-text-primary text-sm">
-                      {info.label}
+                      {phase.label}
                     </div>
-                    <div className="text-text-muted text-2xs">{info.desc}</div>
+                    <div className="text-text-muted text-2xs">{phase.description}</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 text-text-muted text-xs">
@@ -202,8 +216,8 @@ export default function RoadmapClient({ days, activeDay }: Props) {
                                   </span>
                                 </div>
 
-                                {/* Milestone banner after last day of phase */}
-                                {MILESTONES[day.id] && (
+                                {/* Milestone banner */}
+                                {milestoneMap.has(day.id) && (
                                   <div className="my-2 mx-0 px-3 py-2.5 bg-surface-raised border border-surface-border rounded-lg flex items-center gap-3">
                                     <div className="w-8 h-8 bg-surface-border rounded-lg flex items-center justify-center flex-shrink-0">
                                       <Icons.flag size={16} className="text-text-secondary" />
@@ -213,7 +227,7 @@ export default function RoadmapClient({ days, activeDay }: Props) {
                                         Milestone
                                       </div>
                                       <div className="text-text-primary text-sm font-semibold">
-                                        {MILESTONES[day.id]}
+                                        {milestoneMap.get(day.id)}
                                       </div>
                                     </div>
                                     {day.status === "COMPLETE" && (

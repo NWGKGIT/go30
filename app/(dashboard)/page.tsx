@@ -1,23 +1,21 @@
 import { getAuthUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-
-import TaskList from "@/components/dashboard/TaskList";
+import TaskList from "@/components/tasks/TaskList";
 import CalendarGrid from "@/components/dashboard/CalendarGrid";
 import { Icons, Icon, IconName } from "@/components/ui/icons";
 
 export default async function DashboardPage() {
   const user = await getAuthUser();
 
-
   // Get all day progress records with curriculum data
   const allProgress = await prisma.dayProgress.findMany({
     where: { userId: user.id },
     include: {
-      curriculumDay: { include: { tasks: true } },
+      curriculumDay: { include: { tasks: { orderBy: { sortOrder: "asc" } } } },
       tasks: true,
     },
-    orderBy: { dayId: "asc" },
+    orderBy: { curriculumDay: { sortOrder: "asc" } },
   });
 
   // Find the active day (IN_PROGRESS first, then first AVAILABLE)
@@ -26,7 +24,7 @@ export default async function DashboardPage() {
     allProgress.find((p) => p.status === "AVAILABLE");
 
   const completedDays = allProgress.filter((p) => p.status === "COMPLETE");
-  const daysRemaining = 30 - completedDays.length;
+  const daysRemaining = allProgress.length - completedDays.length;
 
   // Build task list for today
   const todayTasks =
@@ -40,7 +38,7 @@ export default async function DashboardPage() {
 
   // Build calendar data
   const calendarDays = allProgress.map((p) => ({
-    id: p.dayId,
+    id: p.curriculumDay.dayNumber,
     status: p.status as "LOCKED" | "AVAILABLE" | "IN_PROGRESS" | "COMPLETE",
     xpEarned: p.xpEarned,
   }));
@@ -86,7 +84,7 @@ export default async function DashboardPage() {
           iconColor="text-accent-green"
           label="Days Done"
           value={`${completedDays.length}`}
-          unit="/30"
+          unit={`/${allProgress.length}`}
         />
         <StatCard
           icon="calendar_month"
@@ -104,7 +102,7 @@ export default async function DashboardPage() {
           <div className="px-4 md:px-5 py-4 border-b border-surface-border">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-2xs font-bold uppercase tracking-widest text-text-muted">
-                Day {activeProgress.dayId}
+                Day {activeProgress.curriculumDay.dayNumber}
               </span>
               <span className="w-1 h-1 rounded-full bg-surface-border" />
               <span className="text-2xs text-text-muted">
@@ -131,7 +129,7 @@ export default async function DashboardPage() {
         <div className="card p-8 text-center">
           <Icons.emoji_events size={36} className="text-accent-green mb-3 block mx-auto" fill />
           <h2 className="font-bold text-text-primary text-lg">
-            All 30 days complete! 🎉
+            All {allProgress.length} days complete! 🎉
           </h2>
           <p className="text-text-secondary text-sm mt-2">
             You&apos;ve finished the entire Go curriculum. Incredible work.

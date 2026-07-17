@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Icons } from "@/components/ui/icons";
+import { updateJournal } from "@/app/actions/journal";
 
 interface Props {
   progressId: string;
@@ -10,18 +11,20 @@ interface Props {
 
 export default function JournalCard({ progressId, initialContent }: Props) {
   const [content, setContent] = useState(initialContent);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   async function save(value: string) {
     setSaveStatus("saving");
-    await fetch("/api/journal", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ progressId, content: value }),
-    });
-    setSaveStatus("saved");
-    setTimeout(() => setSaveStatus("idle"), 2000);
+    const result = await updateJournal(progressId, value);
+
+    if (result.error) {
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    } else {
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus("idle"), 2000);
+    }
   }
 
   function handleChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -44,20 +47,30 @@ export default function JournalCard({ progressId, initialContent }: Props) {
       {/* Header */}
       <div className="px-4 py-2.5 border-b border-surface-border flex items-center justify-between bg-surface-raised flex-shrink-0">
         <div className="flex items-center gap-2">
-
           <Icons.edit_note className="text-text-muted" size={16} />
           <h2 className="font-semibold text-text-primary text-sm">Journal</h2>
         </div>
         <span
-          className={`text-2xs flex items-center gap-1 transition-all ${saveStatus === "saved"
-            ? "text-accent-green"
-            : saveStatus === "saving"
+          className={`text-2xs flex items-center gap-1 transition-all ${
+            saveStatus === "saved"
+              ? "text-accent-green"
+              : saveStatus === "saving"
               ? "text-text-muted"
+              : saveStatus === "error"
+              ? "text-accent-coral"
               : "text-text-muted opacity-0"
-            }`}
+          }`}
         >
-          <Icons.sync spin={saveStatus === "saving"} size={12} className={`transition-opacity ${saveStatus === "saved" ? "opacity-100" : saveStatus === "saving" ? "opacity-100" : "opacity-0"}`} />
-          {saveStatus === "saving" ? "Saving…" : "Saved"}
+          <Icons.sync
+            spin={saveStatus === "saving"}
+            size={12}
+            className={`transition-opacity ${
+              saveStatus === "saved" || saveStatus === "saving" || saveStatus === "error"
+                ? "opacity-100"
+                : "opacity-0"
+            }`}
+          />
+          {saveStatus === "saving" ? "Saving…" : saveStatus === "error" ? "Failed" : "Saved"}
         </span>
       </div>
 
