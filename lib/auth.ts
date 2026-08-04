@@ -39,13 +39,17 @@ export async function ensureDayProgressRecords(userId: string) {
   const existing = await prisma.dayProgress.count({ where: { userId } });
   if (existing > 0) return;
 
-  const days = await prisma.curriculumDay.findMany({ orderBy: { id: "asc" } });
+  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+  const days = await prisma.curriculumDay.findMany({
+    where: { pathSlug: user.pathSlug },
+    orderBy: { sortOrder: "asc" },
+  });
 
   await prisma.dayProgress.createMany({
-    data: days.map((day) => ({
+    data: days.map((day, index) => ({
       userId,
       dayId: day.id,
-      status: day.id === 1 ? "AVAILABLE" : "LOCKED",
+      status: index === 0 ? "AVAILABLE" : "LOCKED",
     })),
     skipDuplicates: true,
   });

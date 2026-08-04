@@ -3,8 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Icons } from "@/components/ui/icons";
-import DayTaskList from "./DayTaskList";
-import GoTourCard from "./GoTourCard";
+import TaskList from "@/components/tasks/TaskList";
+import ResourceCard from "@/components/tasks/ResourceCard";
 import JournalCard from "./JournalCard";
 import SnippetsCard from "./SnippetsCard";
 
@@ -14,19 +14,28 @@ interface Props {
 
 export default async function DayPage({ params }: Props) {
   const { id } = await params;
-  const dayId = parseInt(id, 10);
+  const dayNumber = parseInt(id, 10);
 
-  if (isNaN(dayId) || dayId < 1 || dayId > 30) {
+  if (isNaN(dayNumber) || dayNumber < 1) {
     notFound();
   }
 
   const user = await getAuthUser();
 
+  // Find day by dayNumber
+  const day = await prisma.curriculumDay.findFirst({
+    where: {
+      pathSlug: user.pathSlug,
+      dayNumber,
+    },
+  });
+
+  if (!day) notFound();
 
   const dayProgress = await prisma.dayProgress.findUnique({
-    where: { userId_dayId: { userId: user.id, dayId } },
+    where: { userId_dayId: { userId: user.id, dayId: day.id } },
     include: {
-      curriculumDay: { include: { tasks: true } },
+      curriculumDay: { include: { tasks: { orderBy: { sortOrder: "asc" } } } },
       tasks: true,
       journal: true,
       snippets: { orderBy: { createdAt: "asc" } },
@@ -68,7 +77,7 @@ export default async function DayPage({ params }: Props) {
           Roadmap
         </Link>
         <Icons.chevron_right size={14} />
-        <span className="text-text-primary font-medium">Day {dayId}</span>
+        <span className="text-text-primary font-medium">Day {dayNumber}</span>
       </nav>
 
       {/* Page header */}
@@ -90,7 +99,7 @@ export default async function DayPage({ params }: Props) {
           </span>
         </div>
         <h1 className="text-lg font-black text-text-primary tracking-tight">
-          Day {dayId}: {curriculum.title}
+          Day {dayNumber}: {curriculum.title}
         </h1>
         <p className="text-text-secondary text-sm mt-1">
           {curriculum.description}
@@ -101,19 +110,17 @@ export default async function DayPage({ params }: Props) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left column — Tasks + Tour */}
         <div className="lg:col-span-7 flex flex-col gap-4">
-          <DayTaskList
+          <TaskList
             tasks={tasks}
-            dayId={dayId}
+            dayId={day.id}
             dayStatus={dayProgress.status}
           />
 
           {tourTask && (
-            <GoTourCard
-              taskId={tourTask.id}
-              url={tourTask.url ?? "https://go.dev/tour/basics/1"}
+            <ResourceCard
               label={tourTask.label}
-              dayId={dayId}
-              completed={tasks.find((t) => t.id === tourTask.id)?.completed ?? false}
+              url={tourTask.url ?? "https://go.dev/tour/basics/1"}
+              icon={<Icons.terminal size={24} className="text-accent-blue" />}
             />
           )}
         </div>

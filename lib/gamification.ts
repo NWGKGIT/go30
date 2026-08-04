@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
  */
 export async function completeDayForUser(
   userId: string,
-  dayId: number,
+  dayId: string,
   xpReward: number
 ) {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
@@ -51,21 +51,35 @@ export async function completeDayForUser(
   });
 
   // Mark current day COMPLETE
-  await prisma.dayProgress.update({
+  const dayProgress = await prisma.dayProgress.update({
     where: { userId_dayId: { userId, dayId } },
     data: {
       status: "COMPLETE",
       completedAt: now,
       xpEarned: xpReward,
     },
+    include: { curriculumDay: true },
   });
 
   // Unlock next day if it exists
-  if (dayId < 30) {
-    await prisma.dayProgress.update({
-      where: { userId_dayId: { userId, dayId: dayId + 1 } },
-      data: { status: "AVAILABLE" },
+  const nextDay = await prisma.curriculumDay.findFirst({
+    where: {
+      pathSlug: dayProgress.curriculumDay.pathSlug,
+      dayNumber: dayProgress.curriculumDay.dayNumber + 1,
+    },
+  });
+
+  if (nextDay) {
+    const nextProgress = await prisma.dayProgress.findUnique({
+      where: { userId_dayId: { userId, dayId: nextDay.id } },
     });
+
+    if (nextProgress && nextProgress.status === 'LOCKED') {
+      await prisma.dayProgress.update({
+        where: { id: nextProgress.id },
+        data: { status: "AVAILABLE" },
+      });
+    }
   }
 
   return updatedUser;
@@ -74,7 +88,7 @@ export async function completeDayForUser(
 /**
  * Mark a day as IN_PROGRESS when the first task is checked.
  */
-export async function markDayInProgress(userId: string, dayId: number) {
+export async function markDayInProgress(userId: string, dayId: string) {
   const progress = await prisma.dayProgress.findUnique({
     where: { userId_dayId: { userId, dayId } },
   });
@@ -93,7 +107,7 @@ export async function markDayInProgress(userId: string, dayId: number) {
  */
 export async function uncompleteDayForUser(
   userId: string,
-  dayId: number,
+  dayId: string,
   xpReward: number
 ) {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
@@ -107,25 +121,34 @@ export async function uncompleteDayForUser(
   });
 
   // Revert current day to IN_PROGRESS and remove completedAt/xpEarned
-  await prisma.dayProgress.update({
+  const dayProgress = await prisma.dayProgress.update({
     where: { userId_dayId: { userId, dayId } },
     data: {
       status: "IN_PROGRESS",
       completedAt: null,
       xpEarned: 0,
     },
+    include: { curriculumDay: true },
   });
 
   // Check the next day
-  if (dayId < 30) {
+  const nextDay = await prisma.curriculumDay.findFirst({
+    where: {
+      pathSlug: dayProgress.curriculumDay.pathSlug,
+      dayNumber: dayProgress.curriculumDay.dayNumber + 1,
+    },
+  });
+
+  if (nextDay) {
     const nextDayProgress = await prisma.dayProgress.findUnique({
-      where: { userId_dayId: { userId, dayId: dayId + 1 } },
+      where: { userId_dayId: { userId, dayId: nextDay.id } },
+      include: { tasks: true },
     });
 
     // If next day is completely untouched, lock it again
-    if (nextDayProgress && nextDayProgress.status === "AVAILABLE") {
+    if (nextDayProgress && nextDayProgress.status === "AVAILABLE" && nextDayProgress.tasks.length === 0) {
       await prisma.dayProgress.update({
-        where: { userId_dayId: { userId, dayId: dayId + 1 } },
+        where: { id: nextDayProgress.id },
         data: { status: "LOCKED" },
       });
     }
